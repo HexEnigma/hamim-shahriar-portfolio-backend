@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.db.models import Count, Q, Sum
 from django.db.models.functions import TruncMonth
+from django.http import JsonResponse
 from django.utils import timezone
 from rest_framework import serializers, status
 from rest_framework.exceptions import AuthenticationFailed
@@ -139,3 +140,8 @@ class DashboardStatsView(APIView):
             "recent_comments": recent_comments,
             "posts_per_month": [{"month": f"{y}-{m:02d}", "count": counts.get((y, m), 0)} for y, m in months],
         })
+
+from django.http import JsonResponse
+
+def custom_404(request, exception=None):
+    return JsonResponse({"detail": "Not found."}, status=404)

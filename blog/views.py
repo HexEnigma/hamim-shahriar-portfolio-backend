@@ -23,9 +23,7 @@ from .serializers import (CategorySerializer, CommentCreateSerializer, Moderatio
 
 
 def base_posts():
-    return Post.objects.with_counts().select_related("category", "author").prefetch_related("tags")
-
-
+    return Post.objects.with_counts().select_related("category", "author").prefetch_related("tags").order_by("-published_at", "-created_at")
 class PostViewSet(viewsets.ModelViewSet):
     lookup_field = "slug"
     lookup_value_regex = r"[-\w]+"
