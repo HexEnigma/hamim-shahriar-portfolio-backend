@@ -5,8 +5,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 from django.contrib.auth import get_user_model
-from portfolio.models import Profile, Skill, Education, Experience, Project
-from blog.models import Category, Tag, Post, Comment, ContactMessage
+from portfolio.models import Profile, Skill, Education, Experience, Project, ContactMessage
+from blog.models import Category, Tag, Post, Comment
 
 User = get_user_model()
 
