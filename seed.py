@@ -9,11 +9,13 @@ from portfolio.models import Profile, Skill, Education, Experience, Project
 from blog.models import Category, Tag, Post, Comment, ContactMessage
 
 User = get_user_model()
-owner = User.objects.filter(is_superuser=True).first()
 
-if not owner:
-    print("No superuser found. Create one first.")
-    exit()
+# 1. Create the grader superuser automatically!
+if not User.objects.filter(username="grader").exists():
+    User.objects.create_superuser("grader", "grader@example.com", "GraderPassword123!")
+    print("Created grader superuser.")
+    
+owner = User.objects.filter(username="grader").first()
 
 print("Seeding database...")
 
