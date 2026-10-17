@@ -1,0 +1,1359 @@
+{
+  "info": {
+    "name": "DevFolio API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run top to bottom with the Collection Runner. Set owner_username/owner_password first."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api"
+    },
+    {
+      "key": "owner_username",
+      "value": "CHANGE_ME"
+    },
+    {
+      "key": "owner_password",
+      "value": "CHANGE_ME"
+    },
+    {
+      "key": "visitor",
+      "value": "postman-visitor-1"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{owner_username}}\",\n  \"password\": \"{{owner_password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /auth/login/ -> 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set(\"access\", String(pm.response.json().access));",
+                  "pm.collectionVariables.set(\"refresh\", String(pm.response.json().refresh));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me (owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/auth/me/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /auth/me/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/refresh/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /auth/refresh/ -> 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set(\"access\", String(pm.response.json().access));",
+                  "pm.collectionVariables.set(\"refresh\", String(pm.response.json().refresh));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2 Owner writes",
+      "item": [
+        {
+          "name": "PATCH profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/profile/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"headline\": \"Full Stack Developer | Python & Django | React | REST APIs\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"PATCH /profile/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/skills/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Test Skill\",\n  \"category\": \"TOOLS\",\n  \"proficiency\": 50\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /skills/ -> 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"skill_id\", String(pm.response.json().id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST experience",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/experiences/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company\": \"Postman Test Co\",\n  \"role\": \"Tester\",\n  \"employment_type\": \"FREELANCE\",\n  \"start_date\": \"2024-01-01\",\n  \"is_current\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /experiences/ -> 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"exp_id\", String(pm.response.json().id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST education",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/education/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"institution\": \"Postman Test Institute\",\n  \"degree\": \"Test\",\n  \"field_of_study\": \"QA\",\n  \"start_year\": 2020,\n  \"end_year\": 2021\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /education/ -> 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"edu_id\", String(pm.response.json().id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/categories/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Test Category\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /categories/ -> 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"category_id\", String(pm.response.json().id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST tag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/tags/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"postman-test-tag\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /tags/ -> 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"tag_id\", String(pm.response.json().id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/projects/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman Test Project\",\n  \"summary\": \"Created by the Postman collection.\",\n  \"description\": \"Test project.\",\n  \"category\": \"WEB\",\n  \"github_url\": \"https://github.com/example/postman-test\",\n  \"tech_stack_ids\": [\n    \"{{skill_id}}\"\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /projects/ -> 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"project_slug\", String(pm.response.json().slug));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST post (draft)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/posts/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman Test Post\",\n  \"excerpt\": \"Created by the Postman collection.\",\n  \"content\": \"Postman test content for the portfolio API. Postman test content for the portfolio API. Postman test content for the portfolio API. Postman test content for the portfolio API. Postman test content for the portfolio API. \",\n  \"category\": \"{{category_id}}\",\n  \"tags\": [\n    \"{{tag_id}}\"\n  ],\n  \"status\": \"DRAFT\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /posts/ -> 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"post_slug\", String(pm.response.json().slug));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3 Security (attacker view)",
+      "item": [
+        {
+          "name": "Visitor cannot write a post",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/posts/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"hack\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /posts/ -> 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register endpoint does not exist",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}/auth/register/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /auth/register/ -> 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Draft is hidden from visitors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/posts/{{post_slug}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /posts/{{post_slug}}/ -> 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Draft not in public list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/posts/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /posts/ -> 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"draft title absent\", function () { pm.expect(pm.response.text()).to.not.include(\"Postman Test Post\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Visitor cannot write a skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/skills/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"x\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /skills/ -> 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Visitor cannot read the inbox",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/contact/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /contact/ -> 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Visitor cannot read moderation list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/comments/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /comments/ -> 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Visitor cannot read stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/dashboard/stats/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /dashboard/stats/ -> 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4 Publish and public reads",
+      "item": [
+        {
+          "name": "Publish post",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/posts/{{post_slug}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PUBLISHED\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"PATCH /posts/{{post_slug}}/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/profile/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /profile/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET skills",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/skills/?category=TOOLS"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /skills/?category=TOOLS -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET experiences",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/experiences/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /experiences/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET education",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/education/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /education/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/projects/?search=Postman"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /projects/?search=Postman -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET project detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/projects/{{project_slug}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /projects/{{project_slug}}/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET posts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/posts/?search=Postman&ordering=-views_count"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /posts/?search=Postman&ordering=-views_count -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET post detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Visitor-Id",
+                "value": "{{visitor}}"
+              }
+            ],
+            "url": "{{base_url}}/posts/{{post_slug}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /posts/{{post_slug}}/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/categories/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /categories/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/tags/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /tags/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET owner drafts list",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/posts/?status=all"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /posts/?status=all -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5 Likes, comments, contact, moderation",
+      "item": [
+        {
+          "name": "Like (on)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Visitor-Id",
+                "value": "{{visitor}}"
+              }
+            ],
+            "url": "{{base_url}}/posts/{{post_slug}}/like/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /posts/{{post_slug}}/like/ -> 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"liked\", function () { pm.expect(pm.response.json().liked).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Like (off)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Visitor-Id",
+                "value": "{{visitor}}"
+              }
+            ],
+            "url": "{{base_url}}/posts/{{post_slug}}/like/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /posts/{{post_slug}}/like/ -> 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"unliked\", function () { pm.expect(pm.response.json().liked).to.eql(false); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Like without visitor header",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}/posts/{{post_slug}}/like/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /posts/{{post_slug}}/like/ -> 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create comment (visitor)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/posts/{{post_slug}}/comments/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Visitor\",\n  \"email\": \"visitor@example.com\",\n  \"content\": \"Postman test comment.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /posts/{{post_slug}}/comments/ -> 201\", function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Public comments hide unapproved",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/posts/{{post_slug}}/comments/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /posts/{{post_slug}}/comments/ -> 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"no comments yet\", function () { pm.expect(pm.response.json().count).to.eql(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Moderation list (owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/comments/?is_approved=false"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /comments/?is_approved=false -> 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set(\"comment_id\", String(pm.response.json().results[0].id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Approve comment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/comments/{{comment_id}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_approved\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"PATCH /comments/{{comment_id}}/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Approved comment is public",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/posts/{{post_slug}}/comments/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /posts/{{post_slug}}/comments/ -> 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"one comment\", function () { pm.expect(pm.response.json().count).to.eql(1); });",
+                  "pm.test(\"email not exposed\", function () { pm.expect(pm.response.text()).to.not.include(\"visitor@example.com\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create contact message (visitor)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/contact/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Visitor\",\n  \"email\": \"visitor@example.com\",\n  \"subject\": \"Postman test\",\n  \"message\": \"Hello from the Postman collection.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /contact/ -> 201\", function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Contact inbox (owner)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/contact/?is_read=false"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /contact/?is_read=false -> 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set(\"message_id\", String(pm.response.json().results[0].id));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark message read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/contact/{{message_id}}/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_read\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"PATCH /contact/{{message_id}}/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dashboard stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/dashboard/stats/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET /dashboard/stats/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6 Cleanup",
+      "item": [
+        {
+          "name": "DELETE post",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/posts/{{post_slug}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DELETE /posts/{{post_slug}}/ -> 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/projects/{{project_slug}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DELETE /projects/{{project_slug}}/ -> 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/categories/{{category_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DELETE /categories/{{category_id}}/ -> 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE tag",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/tags/{{tag_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DELETE /tags/{{tag_id}}/ -> 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE skill",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/skills/{{skill_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DELETE /skills/{{skill_id}}/ -> 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE experience",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/experiences/{{exp_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DELETE /experiences/{{exp_id}}/ -> 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE education",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/education/{{edu_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DELETE /education/{{edu_id}}/ -> 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE contact message",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              }
+            ],
+            "url": "{{base_url}}/contact/{{message_id}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DELETE /contact/{{message_id}}/ -> 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7 Logout",
+      "item": [
+        {
+          "name": "Logout (blacklist refresh)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/logout/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"POST /auth/logout/ -> 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
