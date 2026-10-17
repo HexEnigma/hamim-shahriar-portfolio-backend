@@ -9,7 +9,7 @@ from .rules import experience_errors, project_errors
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ["id", "full_name", "headline", "bio", "email", "phone", "location", "avatar", "resume",
+        fields = ["id", "full_name", "headline", "bio", "email", "phone", "location", "avatar", "avatar_url", "resume",
                   "github_url", "linkedin_url", "x_url", "website_url", "years_of_experience",
                   "is_available_for_hire", "updated_at"]
 
@@ -60,7 +60,7 @@ class ProjectSerializer(ResolveMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id", "title", "slug", "summary", "description", "cover_image", "tech_stack", "tech_stack_ids",
+        fields = ["id", "title", "slug", "summary", "description", "cover_image", "cover_image_url", "tech_stack", "tech_stack_ids",
                   "category", "status", "live_url", "github_url", "is_featured", "completed_date",
                   "display_order", "created_at", "updated_at"]
         read_only_fields = ["slug"]

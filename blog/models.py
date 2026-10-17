@@ -64,6 +64,7 @@ class Post(TimeStampedModel):
     excerpt = models.CharField(max_length=300)
     content = models.TextField(blank=True)               # Markdown
     cover_image = models.ImageField(upload_to="posts/", blank=True, null=True, validators=[validate_image])
+    cover_image_url = models.URLField(blank=True, help_text="External URL for cover image")
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.PROTECT, related_name="posts")
     tags = models.ManyToManyField(Tag, blank=True, related_name="posts")
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="posts")

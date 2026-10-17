@@ -52,7 +52,7 @@ class PostListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ["id", "title", "slug", "excerpt", "cover_image", "category", "tags", "status", "published_at",
+        fields = ["id", "title", "slug", "excerpt", "cover_image", "cover_image_url", "category", "tags", "status", "published_at",
                   "views_count", "reading_time", "is_featured", "likes_count", "comments_count", "created_at"]
 
 
@@ -85,7 +85,7 @@ class PostWriteSerializer(ResolveMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ["title", "excerpt", "content", "cover_image", "category", "tags", "status", "is_featured"]
+        fields = ["title", "excerpt", "content", "cover_image", "cover_image_url", "category", "tags", "status", "is_featured"]
 
     def validate_title(self, value):
         if len(value.strip()) < 5:
